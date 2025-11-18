@@ -1,19 +1,24 @@
 import { Router } from 'express';
-import {obtenerEmpleados} from '../controllers/empleados.controllers.js';
-import { eliminarEmpleados } from '../controllers/empleados_controller.js';
+import { obtenerEmpleados, obtenerEmpleado, registrarempleado, eliminarEmpleado, actualizarEmpleadoPatch } from '../controllers/empleados.controllers.js';
 
 const router = Router();
 
-// Ruta para obtener todos los empleados
+// Ruta para obtener todos los clientes
 router.get('/empleados', obtenerEmpleados);
 
-// Ruta para obtener una empleado por su ID
-router.get('/empleado/:id_empleado', obtenerEmpleados);
+// Ruta para obtener un cliente por su id
+router.get('/empleado/:id_empleados', obtenerEmpleado);
 
-// Ruta para registrar una nuevo empleado
-router.post('/empleado', registrarEmpleados);
+// Rutas para registrar un empleado
+router.post('/registrarEmpleado', registrarempleado);
 
-// Ruta para eliminar una empleado por su ID
-router.delete('/eliminarempleado/:id_empleado', eliminarEmpleados);
+// Ruta para eliminar un empleado por su ID
+router.delete('/eliminarempleado/:id_empleado', eliminarEmpleado);
+
+// Ruta para actualizar parcialmente un empleado por su ID
+router.patch('/actualizarEmpleado/:id_empleado', actualizarEmpleadoPatch);
+
+// Ruta para buscar un empleado
+router.patch('/empleados/:id_empleado', actualizarEmpleadoPatch);
 
 export default router;

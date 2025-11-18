@@ -1,0 +1,20 @@
+import { Router } from 'express';
+import { obtenerUsuarios, obtenerUsuario, eliminarUsuario, actualizarUsuarioPatch, verificarUsuario } from '../controllers/usuarios.controllers.js';
+
+const router = Router();
+
+// Ruta para obtener todos los clientes
+router.get('/usuarios', obtenerUsuarios);
+
+// Ruta para obtener un cliente por su id
+router.get('/usuarios/:id_usuarios', obtenerUsuario);
+
+// Ruta para eliminar un usuario por su ID
+router.delete('/eliminarusuario/:id_usuario', eliminarUsuario);
+
+// Ruta para actualizar parcialmente un usuario por su ID
+router.patch('/usuarios/:id_usuario', actualizarUsuarioPatch);
+
+router.post('/verificarUsuario ', verificarUsuario)
+
+export default router;

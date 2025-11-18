@@ -1,0 +1,134 @@
+import { pool } from '../../db_conection.js';
+
+// Obtener todas las Productos
+export const obtenerProductos = async (req, res) => {
+    try {
+        const [result] = await pool.query('SELECT * FROM Productos');
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error al leer los datos.',
+            error: error
+        });
+    }
+};
+
+// Obtener un cliente por su ID
+export const obtenerProducto = async (req, res) => {
+    try {
+        const id_producto = req.params.id_producto;
+        const [result] = await pool.query('SELECT * FROM Productos WHERE id_producto= ? ', [id_producto]);
+if (result.length <= 0) {
+            return res.status(404).json({
+                mensaje: `Error al leer los datos. ID ${id_producto} no encontrado.`
+            });
+        }
+        res.json(result[0]);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error al leer los datos de los empleados.'
+        });
+    }
+};
+
+// Eliminar un producto por su ID
+export const eliminarProducto = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+
+    const [result] = await pool.query(
+      "DELETE FROM Productos WHERE id_producto = ?",
+      [id_producto]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ mensaje: "No se encontró el producto con ese ID" });
+    }
+
+    return res.json({ mensaje: "Producto eliminado correctamente" });
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al eliminar el producto", error: error.message });
+  }
+};
+
+
+// Actualizar parcialmente un producto por su ID
+export const actualizarProductoPatch = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+    const datos = req.body;
+
+    const [result] = await pool.query(
+      'UPDATE Productos SET ? WHERE id_producto = ?',
+      [datos, id_producto]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        mensaje: `Producto con ID ${id_producto} no encontrado.`
+      });
+    }
+
+    res.status(200).json({
+      mensaje: `Producto con ID ${id_producto} actualizado correctamente.`
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: 'Error al actualizar el producto.',
+      error
+    });
+  }
+};
+
+export const registrarProducto = async (req, res) => {
+  try {
+    const { codigo, descripcion, precio, stock, activo } = req.body;
+
+    // Validaciones básicas
+    if (!codigo || !descripcion || precio === undefined || stock === undefined) {
+      return res.status(400).json({ mensaje: 'Faltan datos obligatorios' });
+    }
+
+    // Inserción segura en la base de datos
+    const [result] = await pool.query(
+      'INSERT INTO Producto (codigo, descripcion, precio, stock, activo) VALUES (?, ?, ?, ?, ?)',
+      [codigo, descripcion, precio, stock, activo ?? 1] // activo por defecto 1
+    );
+
+    res.json({ mensaje: 'Producto registrado', id: result.insertId });
+
+  } catch (error) {
+    console.error('Error al registrar producto:', error); // se muestra en consola
+    res.status(500).json({ mensaje: 'Error al registrar el producto', error: error.message });
+  }
+};
+
+export const agregarProducto = async (req, res) => {
+  try {
+    const { nombre_producto, descripcion_producto, id_categoria, precio_unitario, stock, imagen } = req.body;
+
+    if (!nombre_producto || !descripcion_producto || !id_categoria || precio_unitario == null || stock == null) {
+      return res.status(400).json({ 
+        mensaje: 'Faltan datos requeridos: nombre, descripción, categoría, precio o stock.' 
+      });
+    }
+
+    const [result] = await pool.query(
+      'INSERT INTO Productos (nombre_producto, descripcion_producto, id_categoria, precio_unitario, stock, imagen) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre_producto, descripcion_producto, id_categoria, precio_unitario, stock, imagen ?? null]
+    );
+
+    res.status(201).json({
+      mensaje: 'Producto agregado exitosamente',
+      id_insertado: result.insertId
+    });
+
+  } catch (error) {
+    console.error('Error al agregar producto:', error);
+    res.status(500).json({ 
+      mensaje: 'Error interno del servidor al agregar el producto',
+      error: error.message 
+    });
+  }
+};
